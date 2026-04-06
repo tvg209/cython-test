@@ -1,14 +1,16 @@
 
-
-from setuptools import setup
+from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy
 
-setup(
-    ext_modules=cythonize(
-        "banded_solver.pyx",
-        language_level="3",
-        annotate=True
-    ),
+ext = Extension(
+    name="banded_solver",
+    sources=["banded_solver.pyx"],
     include_dirs=[numpy.get_include()],
+    extra_compile_args=["/O2", "/openmp"],
+    extra_link_args=["/openmp"],
+)
+
+setup(
+    ext_modules=cythonize(ext, language_level="3"),
 )
