@@ -1,5 +1,5 @@
 
-name: Build Cython with MinGW (winlibs)
+name: Build Cython (Windows MSVC)
 
 on:
   workflow_dispatch:
@@ -11,28 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download MinGW (winlibs)
-        run: |
-          curl -L -o mingw.zip https://github.com/brechtsanders/winlibs_mingw/archive/refs/tags/12.2.0.zip
-          tar -xf mingw.zip
-          echo "$PWD/winlibs_mingw-12.2.0/mingw64/bin" >> $env:GITHUB_PATH
-
-      - name: Verify gcc
-        run: gcc --version
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
-          pip install cython numpy setuptools wheel
+          pip install numpy cython setuptools wheel
 
-      - name: Build Cython extension with GCC
-        env:
-          CC: gcc
-          CXX: g++
+      - name: Build Cython extension
         run: |
           python setup.py build_ext --inplace
           dir
