@@ -2,7 +2,6 @@
 # cython: boundscheck=False, wraparound=False, cdivision=True
 # cython: language_level=3
 
-from cython.parallel cimport prange
 import numpy as np
 cimport numpy as np
 
@@ -11,7 +10,7 @@ def mv_banded_cython(double[:, :] Ab, int k, double[:] x):
     cdef double[:] y = np.zeros(n, dtype=np.float64)
     cdef Py_ssize_t i, j
 
-    for i in prange(n, nogil=True, schedule='static'):
+    for i in range(n):
         y[i] = Ab[k, i] * x[i]
         for j in range(1, k+1):
             if i - j >= 0:
@@ -20,6 +19,7 @@ def mv_banded_cython(double[:, :] Ab, int k, double[:] x):
                 y[i] += Ab[k+j, i] * x[i+j]
     return y
 
+
 def cholesky_banded_cython(double[:, :] Ab, int k):
     cdef Py_ssize_t n = Ab.shape[1]
     cdef Py_ssize_t i, j, d, jm, im
@@ -27,6 +27,7 @@ def cholesky_banded_cython(double[:, :] Ab, int k):
     cdef int jmax
 
     for j in range(n):
+
         sumjj = 0.0
         for d in range(1, k+1):
             i = j - d
@@ -37,8 +38,7 @@ def cholesky_banded_cython(double[:, :] Ab, int k):
         Ab[k, j] = (<double> np.sqrt(Ab[k, j] - sumjj))
 
         jmax = min(n - 1, j + k)
-
-        for i in prange(j+1, jmax+1, nogil=True, schedule='static'):
+        for i in range(j+1, jmax+1):
             s = 0.0
             for d in range(1, k+1):
                 jm = j - d
@@ -52,13 +52,13 @@ def cholesky_banded_cython(double[:, :] Ab, int k):
 
     return Ab
 
+
 def solve_cholesky_banded_cython(double[:, :] Ab, int k, double[:] b):
     cdef Py_ssize_t n = b.shape[0]
     cdef double[:] y = np.copy(b)
     cdef double[:] x
     cdef Py_ssize_t i, j, d
 
-    # Forward
     for i in range(n):
         for d in range(1, k+1):
             j = i - d
@@ -69,7 +69,6 @@ def solve_cholesky_banded_cython(double[:, :] Ab, int k, double[:] b):
 
     x = np.copy(y)
 
-    # Backward
     for i in range(n-1, -1, -1):
         for d in range(1, k+1):
             j = i + d
