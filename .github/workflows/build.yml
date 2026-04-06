@@ -1,5 +1,5 @@
 
-name: Build Cython Extension
+name: Build Cython Banded Solver
 
 on:
   workflow_dispatch:
@@ -9,26 +9,24 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Install Cython and tools
+      - name: Install dependencies
         run: |
-          pip install cython
-          pip install wheel setuptools
+          pip install cython numpy wheel setuptools
 
       - name: Build Cython extension
         run: |
           python setup.py build_ext --inplace
           dir
 
-      - name: Upload built extension
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cython-module
+          name: cython-banded
           path: "*.pyd"
