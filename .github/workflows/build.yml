@@ -7,18 +7,22 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-      - uses: actions/C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $GITHUB_PATH      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW
+        run: |
+          choco install mingw --yes
+          echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> %GITHUB_PATH%
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
-      - name: Install Python dependences
+      - name: Install Python dependencies
         run: |
-          pip install numpy cython setuptools wheel
+          pip install cython numpy setuptools wheel
 
       - name: Build Cython extension with GCC
         env:
@@ -34,7 +38,3 @@ jobs:
         with:
           name: cython-banded
           path: "*.pyd"
-
-      - name: Install MinGW
-        run: |
-          choco install mingw --yes
