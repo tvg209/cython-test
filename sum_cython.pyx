@@ -36,7 +36,8 @@ def cholesky_banded_cython(double[:, :] Ab, int k):
 
         Ab[k, j] = (<double> np.sqrt(Ab[k, j] - sumjj))
 
-        jmax = min(n-1, j+k)
+        jmax = min(n - 1, j + k)
+
         for i in prange(j+1, jmax+1, nogil=True, schedule='static'):
             s = 0.0
             for d in range(1, k+1):
@@ -46,6 +47,7 @@ def cholesky_banded_cython(double[:, :] Ab, int k):
                     break
                 if abs(jm - i) <= k:
                     s += Ab[k + (jm - i), i] * Ab[k + (jm - j), j]
+
             Ab[k + (j - i), i] = (Ab[k + (j - i), i] - s) / Ab[k, j]
 
     return Ab
@@ -56,6 +58,7 @@ def solve_cholesky_banded_cython(double[:, :] Ab, int k, double[:] b):
     cdef double[:] x
     cdef Py_ssize_t i, j, d
 
+    # Forward
     for i in range(n):
         for d in range(1, k+1):
             j = i - d
@@ -65,6 +68,8 @@ def solve_cholesky_banded_cython(double[:, :] Ab, int k, double[:] b):
         y[i] /= Ab[k, i]
 
     x = np.copy(y)
+
+    # Backward
     for i in range(n-1, -1, -1):
         for d in range(1, k+1):
             j = i + d
