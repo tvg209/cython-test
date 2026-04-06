@@ -1,5 +1,5 @@
 
-name: Build Cython with MinGW
+name: Build Cython with MinGW (winlibs)
 
 on:
   workflow_dispatch:
@@ -7,20 +7,25 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MinGW
+      - name: Download MinGW (winlibs)
         run: |
-          choco install mingw --yes
-          echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> %GITHUB_PATH%
+          curl -L -o mingw.zip https://github.com/brechtsanders/winlibs_mingw/archive/refs/tags/12.2.0.zip
+          tar -xf mingw.zip
+          echo "$PWD/winlibs_mingw-12.2.0/mingw64/bin" >> $env:GITHUB_PATH
+
+      - name: Verify gcc
+        run: gcc --version
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: |
           pip install cython numpy setuptools wheel
 
@@ -29,11 +34,10 @@ jobs:
           CC: gcc
           CXX: g++
         run: |
-          gcc --version
           python setup.py build_ext --inplace
           dir
 
-      - name: Upload compiled module
+      - name: Upload module
         uses: actions/upload-artifact@v4
         with:
           name: cython-banded
