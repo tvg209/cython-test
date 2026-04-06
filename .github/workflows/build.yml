@@ -1,5 +1,5 @@
 
-name: Build Cython Solver
+name: Build Cython with MinGW
 
 on:
   workflow_dispatch:
@@ -9,24 +9,32 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $GITHUB_PATH      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Install deps
+      - name: Install Python dependences
         run: |
-          pip install cython numpy setuptools wheel
+          pip install numpy cython setuptools wheel
 
-      - name: Build
+      - name: Build Cython extension with GCC
+        env:
+          CC: gcc
+          CXX: g++
         run: |
+          gcc --version
           python setup.py build_ext --inplace
           dir
 
-      - name: Upload
+      - name: Upload compiled module
         uses: actions/upload-artifact@v4
         with:
           name: cython-banded
           path: "*.pyd"
+
+      - name: Install MinGW
+        run: |
+          choco install mingw --yes
