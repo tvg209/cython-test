@@ -1,5 +1,5 @@
 
-name: Build Cython Banded Solver
+name: Build Cython Solver
 
 on:
   workflow_dispatch:
@@ -16,16 +16,16 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Install deps
         run: |
-          pip install numpy cython wheel setuptools
+          pip install cython numpy setuptools wheel
 
-      - name: Build Cython extension
+      - name: Build
         run: |
           python setup.py build_ext --inplace
           dir
 
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: cython-banded
