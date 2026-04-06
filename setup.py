@@ -12,5 +12,5 @@ ext = Extension(
 )
 
 setup(
-    ext_modules=cythonize(ext, language_level="3"),
+    ext_modules=cythonize(ext, language_level=3),
 )
