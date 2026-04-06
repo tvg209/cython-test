@@ -18,14 +18,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install cython numpy wheel setuptools
+          pip install cython
+          pip install numpy
+          pip install wheel setuptools
 
-      - name: Build Cython extension
+      - name: Build Cython extension (MSVC)
         run: |
           python setup.py build_ext --inplace
           dir
 
-      - name: Upload artifact
+      - name: Upload built pyd
         uses: actions/upload-artifact@v4
         with:
           name: cython-banded
